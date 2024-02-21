@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagina cu Popup</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            display: block;
+            margin-top: 50px;
+            padding-left: 0px;
+            justify-content: center;
+            overflow-x: hidden;
+            text-align: center;
+            align-items: center;
+            background-image: url(https://i.ibb.co/h25xWvp/IMG-20240129-192058.jpg);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #000000;
+            font-weight: bold;
+            font-size: medium;
+            -webkit-text-stroke: 0.5px #0BF4F4;
+
+
+        }
+
+        .popup {
+            font-family: Arial, Helvetica, sans-serif;
+            border: 3px solid #0BF4F4;
+            box-shadow: 0 0 30px #0BF4F4;
+            display: flex;
+            position: fixed;
+            justify-content: center;
+            align-items: center;
+            width: 85%;
+            height: 80%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #ffffff;
+            padding: 20px;
+            border: 1px solid #000000;
+            z-index: 1000;
+            color: black;
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .popup-buttons {
+            position: relative;
+            top: 50%;
+            margin-left: 20px;
+            margin-top: 10px;
+            width: 100%;
+
+        }
+
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+
+        }
+
+        .image-container {
+            margin: 10px;
+            text-align: center;
+            text-shadow: #ffffff;
+        }
+
+        .image-container img {
+            width: 90px;
+            height: 90px;
+            cursor: pointer;
+
+        }
+
+
+        .bottom-text {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+
+        }
+
+        #dontShowAgain {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+
+        }
+
+        .text {
+            position: fixed;
+            margin-top: 20px;
+            margin-right: 5px;
+            font-size: large;
+            font-style: italic;
+
+        }
+
+        .but1 {
+            background: linear-gradient(to right, #0BF4F4, #ffffff);
+            padding: 10px;
+            width: 100%;
+            display: block;
+            color: #000000;
+            border: 1px solid black;
+            font-family: Arial, Helvetica, sans-serif;
+            font-style: italic;
+            font-size: large;
+            -webkit-text-stroke: 1px rgb(0, 0, 0);
+            cursor: pointer;
+
+        }
+
+        .but2 {
+            background: linear-gradient(to right, #0BF4F4, #ffffff);
+            padding: 10px;
+            width: 100%;
+            display: block;
+            color: #000000;
+            border: 1px solid black;
+            font-family: Arial, Helvetica, sans-serif;
+            font-style: italic;
+            font-size: large;
+            -webkit-text-stroke: 1px rgb(0, 0, 0);
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="popup-overlay" id="popupOverlay"></div>
+
+    <div class="popup" id="popup">
+        <p class="text">Aplicația necesită acces la contul Google Drive utilizat pentru stocarea datelor.
+            Pentru a solicita permisiunile necesare, accesați butonul "CERE ACCES!", selectați / completați un e-mail
+            valid si trimiteți solicitarea.
+            În limita disponibilității noastre vi se vor acorda permisiunile necesare, după care vor putea fi accesate
+            categoriile din meniul principal.
+            Vă mulțumim pentru înțelegere.</p>
+        <div class="popup-buttons">
+            <button class="but1" onclick="openLink()">CERE ACCES!</button><br><br>
+            <button class="but2" onclick="showImages()">INTRĂ ÎN MENIU</button>
+        </div>
+        <div id="dontShowAgain">
+            <label for="noShowCheckbox">Nu mai afișa această fereastră:</label>
+            <input type="checkbox" id="noShowCheckbox" name="noShowCheckbox" onchange="setNoShowAgain()">
+        </div>
+    </div>
+
+    <div class="gallery" id="imageGallery">
+    </div>
+
+    <div class="bottom-text" id="bottomText" style="display: none;">
+        <p></p>
+        <div>
+            <label for="noShowCheckboxBottom" color="black">Nu mai afișa fereastra popup:</label>
+            <input type="checkbox" id="noShowCheckboxBottom" name="noShowCheckboxBottom" onchange="setNoShowAgain()">
+        </div>
+    </div>
+
+    <script>
+        function openLink() {
+            // Verificăm dacă trebuie să se afișeze popup-ul
+            if (localStorage.getItem('noShowAgain')) {
+                // Dacă nu trebuie să se mai afișeze, se execută direct funcția pentru Butonul 2
+                showImages();
+                return;
+            }
+
+            // Verificăm dacă avem deja un atribut "data-clicks"
+            if (!localStorage.getItem('data-clicks')) {
+                localStorage.setItem('data-clicks', '0');
+            }
+
+            // Incrementăm valoarea atributului "data-clicks" și o convertim la număr
+            let clicks = parseInt(localStorage.getItem('data-clicks')) + 1;
+            localStorage.setItem('data-clicks', clicks);
+
+            // Dacă s-a apăsat de mai mult de 3 ori, afișăm mesajul și salvăm preferința pentru a nu mai afișa
+            if (clicks >= 4) {
+                alert("Solicitare trimisă, accesați categoriile din meniul principal");
+                localStorage.setItem('noShowAgain', 'true');
+                document.getElementById('noShowCheckbox').checked = true;
+            } else {
+                // Altfel, deschidem link-ul
+                window.open("https://drive.google.com/drive/folders/1hTegKqNbbz10A9ytPtK2usYQGXdZDTll");
+            }
+        }
+
+        function showImages() {
+            // Stergem popup-ul
+            document.getElementById("popupOverlay").style.display = "none";
+            document.getElementById("popup").style.display = "none";
+
+            // Afisam imaginile si link-urile aferente
+            let images = [
+                { src: "https://i.ibb.co/FXjBHyL/IMG-20240129-WA0009.jpg", alt: "Autoturisme", link: "https://drive.google.com/drive/folders/1WwLU9FQhThTu8UMljuj2Red4LLDbAc1z" },
+                { src: "https://i.ibb.co/FK08xwK/IMG-20240129-191658.jpg", alt: "Camioane", link: "https://drive.google.com/drive/u/2/folders/1t0aAio4GAkQnigNvAfwswHzEEAqCFUlQ" },
+                { src: "https://i.ibb.co/SRm86Nh/IMG-20240201-113234.jpg", alt: "Autocare", link: "https://drive.google.com/drive/folders/1JPcYyGCT7vkjvv1nCJ9jAPdFlNemY1wt" },
+                { src: "https://i.ibb.co/9vWXn1K/IMG-20240129-200344.jpg", alt: "Motociclete", link: "https://drive.google.com/drive/folders/1_Ff6Vk1NTHJzBYcLO0vL8PQzode7HQRE" },
+                { src: "https://i.ibb.co/sH6vfQj/IMG-20240129-194602.png", alt: "Ambarcațiuni", link: "https://drive.google.com/drive/folders/1eBRifSepn3WyWvy7qBQqXSvwqqTT_wj6" },
+                { src: "https://i.ibb.co/rFp1Q3C/IMG-20240130-142415.jpg", alt: "Remorci", link: "https://drive.google.com/drive/folders/1vhYw9KsHSj23DTKa9RBtoJz_nvIB5Alm" },
+                { src: "https://i.ibb.co/n8gH70h/IMG-20240130-141409.jpg", alt: "Rem.ușoare", link: "https://drive.google.com/drive/folders/13GTiPMdRz4QNjkovuH-un6gz__Y1RnMp" },
+                { src: "https://i.ibb.co/XjVMQwT/IMG-20240130-142932.jpg", alt: "Rulote", link: "https://drive.google.com/drive/folders/1QD0U2oao99_H3b7-e_NbEX24VDjYy86n" },
+                { src: "https://i.ibb.co/8Px79nf/IMG-20240130-151640.jpg", alt: "Utilaje", link: "https://drive.google.com/drive/folders/1nDfpdF93_cfjKkgX3WpJ-qbAmW7l9sO6" },
+                { src: "https://i.ibb.co/fkW51L6/IMG-20240130-154557.jpg", alt: "Visibile VIN", link: "https://drive.google.com/drive/folders/17Uww-3o3hFoc_w--_zF5C1_Q8UeERxB1" },
+                { src: "https://i.ibb.co/WzVZBQM/IMG-20240207-163104.jpg", alt: "Alerte VIN", link: "https://drive.google.com/drive/folders/1BbKO8xg9ZCJJkR4uAOuZTaQcUxtQjpty" }
+
+            ];
+
+            let gallery = document.getElementById("imageGallery");
+
+            images.forEach(function (image) {
+                let imageContainer = document.createElement("div");
+                imageContainer.className = "image-container";
+                let img = document.createElement("img");
+                img.src = image.src;
+                img.alt = image.alt;
+                img.onclick = function () {
+                    window.open(image.link);
+                };
+                let caption = document.createElement("p");
+                caption.textContent = image.alt;
+                imageContainer.appendChild(img);
+                imageContainer.appendChild(caption);
+                gallery.appendChild(imageContainer);
+            });
+        }
+
+        function setNoShowAgain() {
+            if (document.getElementById('noShowCheckbox').checked) {
+                localStorage.setItem('noShowAgain', 'true');
+                document.getElementById('noShowCheckboxBottom').checked = true; // Setam bifarea si la checkbox-ul din partea de jos
+            } else {
+                localStorage.removeItem('noShowAgain');
+                document.getElementById('noShowCheckboxBottom').checked = false; // Dezactivam bifarea la checkbox-ul din partea de jos
+            }
+        }
+
+        function showBottomText() {
+            document.getElementById("bottomText").style.display = "block";
+            setTimeout(function () {
+                document.getElementById("bottomText").style.display = "none";
+            }, 5000); // Afișăm textul pentru 5 secunde
+        }
+
+        // La incarcarea paginii, verificam daca trebuie sa afisam popup-ul
+        window.onload = function () {
+            showBottomText(); // Afisam textul pentru 5 secunde
+            if (!localStorage.getItem('noShowAgain')) {
+                document.getElementById("popupOverlay").style.display = "block";
+                document.getElementById("popup").style.display = "block";
+            } else {
+                showImages();
+            }
+
+            // Activam checkbox-ul din partea de jos daca trebuie sa fie bifat
+            if (localStorage.getItem('noShowAgain')) {
+                document.getElementById('noShowCheckboxBottom').checked = true;
+            }
+        };
+    </script>
+
+</body>
+
+</html>
